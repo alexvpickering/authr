@@ -1,8 +1,9 @@
 #' Add user to MongoDB database
 #'
-#' Adds email, unique hashid, and hashed password to
-#' specified MongoDB database in 'users' collection. JSON
-#' web token is returned for subsequent API authorzation.
+#' Adds email, unique hashid (useful for example a user folder),
+#' and hashed password to specified MongoDB database in 'users'
+#' collection. JSON web token with email and hashid claim is
+#' returned for subsequent API authorzation.
 #'
 #'
 #' @param email Email address of user.
@@ -18,9 +19,7 @@ add_user <- function(email, password, db, secret) {
 
   # check if user exists
   con <- mongolite::mongo('users', db)
-  is_user <- con$count(
-    jsonlite::toJSON(list(email = email))
-    )
+  is_user <- con$count(sprintf('{"email": "%s"}', email))
 
   if (is_user)
     stop('User with email ', email, ' already exists.')
@@ -28,13 +27,10 @@ add_user <- function(email, password, db, secret) {
   hashid <- get_hashid(con$count()+1)
 
   # insert user
-  con$insert(
-    jsonlite::toJSON(list(
-      email = email,
-      hashid = hashid,
-      password = sodium::password_store(password)
+  con$insert(sprintf(
+      '{"email": "%s", "hashid": "%s", "password": "%s"}',
+      email, hashid, sodium::password_store(password)
     ))
-  )
 
   # return JSON web token
   jwt <- create_jwt(secret, email = email, hashid = hashid)
