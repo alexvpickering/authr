@@ -1,30 +1,55 @@
+#' Forgot password API endpoint.
+#'
+#' Checks if user exists, generates unique time-limited (24 hour) reset token,
+#' and sends reset email. Reset token is hashed then stored in database
+#' to prevent password resets if database is compromised.
+#'
+#' @param email Email address of user that forgot password.
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples
 forgot_password <- function(email) {
 
   # confirm that users email is in db
   con <- mongolite::mongo('users', Sys.getenv('USERS_DB'))
   is_user <- con$count(sprintf('{"email": "%s"}', email))
 
-  if (!is_user) stop('User with email ', email, ' does not exist.')
+  # dont give away if user exists
+  if (!is_user) return()
 
   # generate unique reset token
   while (!exists('hash') ||
          con$count(sprintf('{"reset": "%s"}', hash)) != 0) {
 
-    token <- stringi::stri_rand_strings(1, 15)
-    hash  <- sodium::password_store(token)
+    token <- stringi::stri_rand_strings(1, 20)
+    hash  <- rawToChar(sodium::hash(charToRaw(token)))
   }
 
   # store hashed token
   con$update(
     sprintf('{"email": "%s"}', email),
-    sprintf('{"$set": {"reset": "%s"}}', hash)
+    sprintf('{"$set": {"reset": "%s", "reset_expire": %s}}',
+            hash, unclass(Sys.time()) + 86400)
   )
 
   # send reset email
   send_reset(email, token)
-
+  return()
 }
 
+#' Sends reset password email
+#'
+#' Called by forgot_password. Requires EMAIL_VARS environment
+#' variable (see vignette).
+#'
+#' @inheritParams forgot_password
+#' @param token Reset token
+#'
+#' @return NULL
+#'
+#' @examples
 send_reset <- function(email, token) {
 
   # get needed variables
@@ -41,6 +66,7 @@ send_reset <- function(email, token) {
   reset_mailr$to <- email
 
   do.call(mailR::send.mail, reset_mailr)
+  return()
 }
 
 #' Construct email body from template.
