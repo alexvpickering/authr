@@ -41,9 +41,6 @@ test_that("login_user returns correct JWT with invalid credentials", {
 
 
 
-
-
-
 # clean up
 con <- mongolite::mongo(collection = 'users', db = 'test')
 con$drop()

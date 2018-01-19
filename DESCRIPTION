@@ -14,5 +14,6 @@ Imports:
   mongolite,
   hashids,
   jsonlite,
-  jose
+  jose,
+  mailR
 Suggests: testthat
