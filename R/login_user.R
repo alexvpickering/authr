@@ -6,10 +6,10 @@
 #' @export
 #'
 #' @examples
-login_user <- function(email, password, db, secret) {
+login_user <- function(email, password) {
 
   # check if user exists
-  con   <- mongolite::mongo('users', db)
+  con   <- mongolite::mongo('users', get_env('USERS_DB'))
   saved <- con$find(
     sprintf('{"email" : "%s"}', email)
   )
@@ -21,6 +21,6 @@ login_user <- function(email, password, db, secret) {
 
   if (!valid) stop("Invalid email/password.")
 
-  jwt <- create_jwt(secret, email = email, hashid = saved$hashid)
+  jwt <- create_jwt(get_env('JWT_SECRET'), email = email, hashid = saved$hashid)
   return(jwt)
 }

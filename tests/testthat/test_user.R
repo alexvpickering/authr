@@ -1,5 +1,8 @@
 library(authr)
 
+Sys.setenv(USERS_DB = 'test', JWT_SECRET = 'secret')
+
+
 
 test_that("add_user won't add the same user twice", {
 
@@ -10,8 +13,8 @@ test_that("add_user won't add the same user twice", {
   secret <- 'secret'
 
   # try adding user twice
-  add_user(email, password, db, secret)
-  expect_error(add_user(email, password, db, secret))
+  add_user(email, password)
+  expect_error(add_user(email, password))
 })
 
 test_that("login_user returns correct JWT with invalid credentials", {
@@ -23,8 +26,8 @@ test_that("login_user returns correct JWT with invalid credentials", {
   secret <- 'secret'
 
   # add user then login
-  jwt1 <- add_user(email, password, db, secret)
-  jwt2 <- login_user(email, password, db, secret)
+  jwt1 <- add_user(email, password)
+  jwt2 <- login_user(email, password)
 
   jwt1 <- jose::jwt_decode_hmac(jwt1, secret)
   jwt2 <- jose::jwt_decode_hmac(jwt2, secret)
@@ -42,5 +45,6 @@ test_that("login_user returns correct JWT with invalid credentials", {
 
 
 # clean up
+Sys.unsetenv(c('USERS_DB', 'JWT_SECRET'))
 con <- mongolite::mongo(collection = 'users', db = 'test')
 con$drop()

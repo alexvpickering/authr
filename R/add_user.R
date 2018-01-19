@@ -65,6 +65,15 @@ get_hashid <- function(int, salt='salt', min_length=5) {
   hashids::encode(int, h)
 }
 
+#' Get environment variable.
+#'
+#' Throws error is environment variable is not defined.
+#'
+#' @param var_name Environment variable to get.
+#'
+#' @return Value of environment variable.
+#'
+#' @examples
 get_env <- function(var_name) {
   var <- Sys.getenv(var_name)
   if (var == '') stop(var_name, ' environment variable is not set.')
