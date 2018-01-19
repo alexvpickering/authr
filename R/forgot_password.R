@@ -13,7 +13,7 @@
 forgot_password <- function(email) {
 
   # confirm that users email is in db
-  con <- mongolite::mongo('users', Sys.getenv('USERS_DB'))
+  con <- mongolite::mongo('users', get_env('USERS_DB'))
   is_user <- con$count(sprintf('{"email": "%s"}', email))
 
   # dont give away if user exists
@@ -53,7 +53,7 @@ forgot_password <- function(email) {
 send_reset <- function(email, token) {
 
   # get needed variables
-  source(Sys.getenv('EMAIL_VARS'), local = TRUE)
+  source(get_env('EMAIL_VARS'), local = TRUE)
 
   # checks
   if (is.null(reset_template$url)) stop("No 'url' variable (prepends reset token).")

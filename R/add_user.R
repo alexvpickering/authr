@@ -16,7 +16,7 @@
 add_user <- function(email, password) {
 
   # check if user exists
-  con <- mongolite::mongo('users', Sys.getenv('USERS_DB'))
+  con <- mongolite::mongo('users', get_env('USERS_DB'))
   is_user <- con$count(sprintf('{"email": "%s"}', email))
 
   if (is_user)
@@ -47,7 +47,7 @@ add_user <- function(email, password) {
 #' @examples
 create_jwt <- function(...) {
   claim <- jose::jwt_claim(...)
-  jose::jwt_encode_hmac(claim, Sys.getenv('JWT_SECRET'))
+  jose::jwt_encode_hmac(claim, get_env('JWT_SECRET'))
 }
 
 #' Generates unique hash identifier
@@ -63,4 +63,10 @@ create_jwt <- function(...) {
 get_hashid <- function(int, salt='salt', min_length=5) {
   h <- hashids::hashid_settings(salt, min_length)
   hashids::encode(int, h)
+}
+
+get_env <- function(var_name) {
+  var <- Sys.getenv(var_name)
+  if (var == '') stop(var_name, ' environment variable is not set.')
+  return(var)
 }
