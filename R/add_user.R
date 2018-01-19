@@ -8,17 +8,15 @@
 #'
 #' @param email Email address of user.
 #' @param password Password of user.
-#' @param db MongoDB database name to connect to.
-#' @param secret String used to encode JSON web token.
 #'
 #' @return JSON web token.
 #' @export
 #'
 #' @examples
-add_user <- function(email, password, db, secret) {
+add_user <- function(email, password) {
 
   # check if user exists
-  con <- mongolite::mongo('users', db)
+  con <- mongolite::mongo('users', Sys.getenv('USERS_DB'))
   is_user <- con$count(sprintf('{"email": "%s"}', email))
 
   if (is_user)
@@ -33,14 +31,13 @@ add_user <- function(email, password, db, secret) {
     ))
 
   # return JSON web token
-  jwt <- create_jwt(secret, email = email, hashid = hashid)
+  jwt <- create_jwt(email = email, hashid = hashid)
   return(jwt)
 }
 
 #' Create JSON web token
 #'
 #' @param claim Named list of claims.
-#' @param secret String used to encode JWT.
 #' @param ... Claims to include.
 #'
 #' @seealso \link[jose]{jwt_claim}
@@ -48,9 +45,9 @@ add_user <- function(email, password, db, secret) {
 #' @return JSON web token string.
 #'
 #' @examples
-create_jwt <- function(secret, ...) {
+create_jwt <- function(...) {
   claim <- jose::jwt_claim(...)
-  jose::jwt_encode_hmac(claim, secret)
+  jose::jwt_encode_hmac(claim, Sys.getenv('JWT_SECRET'))
 }
 
 #' Generates unique hash identifier

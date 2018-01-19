@@ -1,0 +1,8 @@
+# secret for decoding JSON web token
+JWT_SECRET=secret
+
+# variables to send emails using mailr
+EMAIL_VARS=path/to/email/vars.R
+
+# MongoDB database to store users collection
+USERS_DB=test
