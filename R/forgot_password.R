@@ -66,10 +66,10 @@ send_reset <- function(email, token) {
   reset_vars$reset_url <- paste0(reset_vars$reset_url, token)
 
   # construct body from template
-  reset_mailr$body <- use_template(reset_vars)
-  reset_mailr$to <- email
+  reset_ses$message <- use_template(reset_vars)
+  reset_ses$to <- email
 
-  do.call(mailR::send.mail, reset_mailr)
+  do.call(aws.ses::send_email, reset_ses)
   return()
 }
 

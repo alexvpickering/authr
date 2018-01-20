@@ -1,28 +1,15 @@
 # for authr to send emails using Amazon SES
-# see http://www.open-meta.org/technology/how-to-send-email-from-r-with-the-help-of-amazon-ses-and-mailr/
 
-# smtp argument to mailR::send.mail
-smtp = list(
-  host.name = '',
-  port      = '',
-  user.name = '',
-  passwd    = '',
-  ssl       = TRUE
-)
+# arguments to aws.ses::send_email ----
+# NOTE: 'html' or 'message' and 'to' get added
 
-# other arguments to mailR::send.mail for send_reset ('body' and 'to' get added)
-reset_mailr <- list(
+reset_ses <- list(
   from         = '',
-  subject      = '',
-  smtp         = smtp,
-  authenticate = TRUE,
-  send         = TRUE,
-  replyTo      = NULL,
-  html         = FALSE,
-  inline       = FALSE
+  subject      = 'Reset your Password'
 )
 
-# variables used by send_reset and use_template
+
+# variables for reset template ----
 reset_vars <- list(
 
   # required
@@ -30,7 +17,9 @@ reset_vars <- list(
   reset_url = 'http://<URL_TO_PASSWORD_RESET_PAGE>?token=',
 
   # additional values to substitute in template
-  product   = 'AuthR'
+  product   = 'authr'
 )
+
+
 
 
