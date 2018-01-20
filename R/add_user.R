@@ -79,3 +79,14 @@ get_env <- function(var_name) {
   if (var == '') stop(var_name, ' environment variable is not set.')
   return(var)
 }
+
+#' Open template files needed for authr.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+open_templates <- function() {
+  templates <- c('.Renviron', 'email/reset.txt', 'email/vars.R')
+  file.edit(file.path(system.file(package='authr'), 'config-templates', templates))
+}
