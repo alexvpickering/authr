@@ -15,6 +15,6 @@ Imports:
   hashids,
   jsonlite,
   jose,
-  mailR,
+  aws.ses,
   stringi
 Suggests: testthat

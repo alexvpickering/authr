@@ -1,3 +1,16 @@
+#' Reset password endpoint
+#'
+#' First verifies that token is valid and not expired. Then stores
+#' new password and removes reset hash and its expiry time. Finally
+#' sends an email to confirm to the user that the password was reset.
+#'
+#' @param password New password
+#' @param token
+#'
+#' @return
+#' @export
+#'
+#' @examples
 reset_password <- function(password, token) {
 
   # confirm that user with non-expired token is in db
@@ -16,5 +29,6 @@ reset_password <- function(password, token) {
             "$unset": {"reset": "", "reset_expire": ""}}',
             sodium::password_store(password)
   ))
+
   return()
 }

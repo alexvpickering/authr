@@ -30,10 +30,29 @@ add_user <- function(email, password) {
       email, hashid, sodium::password_store(password)
     ))
 
+  # send welcome email
+  send_email(email, type='welcome')
+
   # return JSON web token
   jwt <- create_jwt(email = email, hashid = hashid)
   return(jwt)
 }
+
+send_welcome <- function(email) {
+
+  # get needed variables
+  source(get_env('EMAIL_VARS'), local = TRUE)
+
+  # construct body from template
+  welcome_ses$message <- use_template(welcome_vars)
+  welcome_ses$to <- email
+
+  do.call(aws.ses::send_email, welcome_ses)
+  return()
+}
+
+
+
 
 #' Create JSON web token
 #'

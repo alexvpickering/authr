@@ -34,8 +34,8 @@ forgot_password <- function(email) {
             hash_token, unclass(Sys.time()) + 86400)
   )
 
-  # send reset email
-  send_reset(email, token)
+  # send forgot password email
+  send_email(email, type='forgot_pw')
   return()
 }
 
@@ -43,66 +43,3 @@ hash_string <- function(string) {
   sodium::bin2hex(sodium::hash(charToRaw(string)))
 }
 
-#' Sends reset password email
-#'
-#' Called by forgot_password. Requires EMAIL_VARS environment
-#' variable (see README).
-#'
-#' @inheritParams forgot_password
-#' @param token Reset token
-#'
-#' @return NULL
-#'
-#' @examples
-send_reset <- function(email, token) {
-
-  # get needed variables
-  source(get_env('EMAIL_VARS'), local = TRUE)
-
-  # checks
-  if (is.null(reset_vars$reset_url)) stop("No 'url' variable (prepends reset token).")
-
-  # append token to reset url
-  reset_vars$reset_url <- paste0(reset_vars$reset_url, token)
-
-  # construct body from template
-  reset_ses$message <- use_template(reset_vars)
-  reset_ses$to <- email
-
-  do.call(aws.ses::send_email, reset_ses)
-  return()
-}
-
-#' Construct email body from template.
-#'
-#' Template variables specified with {{ variable_name }}
-#'
-#' @param vars
-#'
-#' @return
-#' @export
-#'
-#' @examples
-use_template <- function(vars) {
-
-  # checks
-  if (is.null(vars$template))
-    stop ("No 'template' variable (specifies path to template).")
-
-  # read in template
-  template <- paste(readLines(vars$template), collapse="\n")
-
-  # get handlebar and corresponding substitute variables
-  hbars <- stringi::stri_extract_all_regex(template, '\\{\\{ .+? \\}\\}')[[1]]
-  subs  <- gsub('\\{\\{ (.+?) \\}\\}', '\\1', hbars)
-
-  # check for missing substitutes
-  missing <- setdiff(subs, names(vars))
-
-  if (length(missing))
-    stop('Email template expects variables that are not defined: ', missing)
-
-  # make substitutions
-  body <- stringi::stri_replace_all_fixed(template, hbars, unlist(vars)[subs], vectorize_all=FALSE)
-  return(body)
-}

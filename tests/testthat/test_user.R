@@ -1,15 +1,17 @@
 library(authr)
 context("add and login user")
 
-Sys.setenv(USERS_DB = 'test', JWT_SECRET = 'secret')
+Sys.setenv(USERS_DB = 'test', JWT_SECRET = 'secret', EMAIL_VARS = '/var/www/R/email/vars.R', SEND_EMAIL = 'FALSE')
+
+# clean up test database
+con <- mongolite::mongo(collection = 'users', db = 'test')
+try(con$drop(), silent = TRUE)
 
 test_that("add_user won't add the same user twice", {
 
   # setup
-  email <- 'test1@gmail.com'
+  email <- 'blah@gmail.com'
   password <- '12345'
-  db <- 'test'
-  secret <- 'secret'
 
   # try adding user twice
   add_user(email, password)
@@ -19,21 +21,15 @@ test_that("add_user won't add the same user twice", {
 test_that("login_user returns correct JWT with invalid credentials", {
 
   # setup
-  email <- 'test2@gmail.com'
+  email <- 'blah@gmail.com'
   password <- '12345'
-  db <- 'test'
-  secret <- 'secret'
 
-  # add user then login
-  jwt1 <- add_user(email, password)
-  jwt2 <- login_user(email, password)
-
-  jwt1 <- jose::jwt_decode_hmac(jwt1, secret)
-  jwt2 <- jose::jwt_decode_hmac(jwt2, secret)
+  # login
+  jwt <- login_user(email, password)
+  jwt <- jose::jwt_decode_hmac(jwt, Sys.getenv('JWT_SECRET'))
 
   # check claims
-  expect_equal(jwt1$email, jwt2$email, email)
-  expect_equal(jwt1$hashid, jwt2$hashid)
+  expect_equal(jwt$email, email)
 
   # incorrect credentials
   expect_error(login_user(email, 'FakePassword'))
@@ -44,6 +40,6 @@ test_that("login_user returns correct JWT with invalid credentials", {
 
 
 # clean up
-Sys.unsetenv(c('USERS_DB', 'JWT_SECRET'))
+Sys.unsetenv(c('USERS_DB', 'JWT_SECRET', 'EMAIL_VARS', 'SEND_EMAIL'))
 con <- mongolite::mongo(collection = 'users', db = 'test')
 try(con$drop(), silent = TRUE)
