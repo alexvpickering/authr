@@ -1,8 +1,7 @@
 library(authr)
+context("add and login user")
 
 Sys.setenv(USERS_DB = 'test', JWT_SECRET = 'secret')
-
-
 
 test_that("add_user won't add the same user twice", {
 
@@ -47,4 +46,4 @@ test_that("login_user returns correct JWT with invalid credentials", {
 # clean up
 Sys.unsetenv(c('USERS_DB', 'JWT_SECRET'))
 con <- mongolite::mongo(collection = 'users', db = 'test')
-con$drop()
+try(con$drop(), silent = TRUE)

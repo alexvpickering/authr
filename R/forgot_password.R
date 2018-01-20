@@ -20,18 +20,18 @@ forgot_password <- function(email) {
   if (!is_user) return()
 
   # generate unique reset token
-  while (!exists('hash') ||
-         con$count(sprintf('{"reset": "%s"}', hash)) != 0) {
+  while (!exists('hash_token') ||
+         con$count(sprintf('{"reset": "%s"}', hash_token)) != 0) {
 
     token <- stringi::stri_rand_strings(1, 20)
-    hash  <- rawToChar(sodium::hash(charToRaw(token)))
+    hash_token <- hash_string(token)
   }
 
   # store hashed token
   con$update(
     sprintf('{"email": "%s"}', email),
     sprintf('{"$set": {"reset": "%s", "reset_expire": %s}}',
-            hash, unclass(Sys.time()) + 86400)
+            hash_token, unclass(Sys.time()) + 86400)
   )
 
   # send reset email
@@ -39,10 +39,14 @@ forgot_password <- function(email) {
   return()
 }
 
+hash_string <- function(string) {
+  sodium::bin2hex(sodium::hash(charToRaw(string)))
+}
+
 #' Sends reset password email
 #'
 #' Called by forgot_password. Requires EMAIL_VARS environment
-#' variable (see vignette).
+#' variable (see README).
 #'
 #' @inheritParams forgot_password
 #' @param token Reset token
@@ -56,10 +60,10 @@ send_reset <- function(email, token) {
   source(get_env('EMAIL_VARS'), local = TRUE)
 
   # checks
-  if (is.null(reset_template$url)) stop("No 'url' variable (prepends reset token).")
+  if (is.null(reset_vars$reset_url)) stop("No 'url' variable (prepends reset token).")
 
   # append token to reset url
-  reset_vars$url <- paste0(reset_vars$url, token)
+  reset_vars$reset_url <- paste0(reset_vars$reset_url, token)
 
   # construct body from template
   reset_mailr$body <- use_template(reset_vars)
