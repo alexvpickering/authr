@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-add_user <- function(email, password) {
+register_user <- function(email, password) {
 
   # check if user exists
   con <- mongolite::mongo('users', get_env('USERS_DB'))
@@ -106,6 +106,6 @@ get_env <- function(var_name) {
 #'
 #' @examples
 open_templates <- function() {
-  templates <- c('.Renviron', 'email/reset.txt', 'email/vars.R')
+  templates <- c('.Renviron', 'email/forgot_pw.txt', 'email/welcome.txt', 'email/vars.R')
   file.edit(file.path(system.file(package='authr'), 'config-templates', templates))
 }
