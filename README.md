@@ -6,7 +6,7 @@
 
 * Uses MongoDB
 * Passwords and reset tokens are hashed for storage
-* `login_user` return JWTs to authenticate user-only endpoints
+* `login_user` return [JWTs](https://jwt.io/) to authenticate user-only endpoints
 * `forgot_password` generates reset token valid for 24 hours
 * `forgot_password` and `register_user` send customizable emails using Amazon SES
 
