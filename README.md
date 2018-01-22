@@ -66,7 +66,7 @@ readRenviron('/var/www/R/.Renviron')
 packages <- c('authr', 'your_package')
 
 # 'open' functions can be accessed without authentication
-open <- list(authr = c('add_user',
+open <- list(authr = c('register_user',
                        'login_user',
                        'forgot_password',
                        'reset_password'))
