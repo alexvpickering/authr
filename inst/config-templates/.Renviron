@@ -3,6 +3,7 @@ JWT_SECRET=secret
 
 # path to variables to send emails using aws.ses
 EMAIL_VARS=path/to/email/vars.R
+SEND_EMAIL=TRUE
 
 # credentials for Amazon SES
 AWS_ACCESS_KEY_ID=
