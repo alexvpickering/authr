@@ -14,12 +14,12 @@ login_user <- function(email, password) {
     sprintf('{"email" : "%s"}', email)
   )
 
-  if (!nrow(saved)) stop("Invalid email/password.")
+  if (!nrow(saved)) stop("Invalid credentials.")
 
   # check if password is correct
   valid <- sodium::password_verify(saved$password, password)
 
-  if (!valid) stop("Invalid email/password.")
+  if (!valid) stop("Invalid credentials.")
 
   jwt <- create_jwt(get_env('JWT_SECRET'), email = email, hashid = saved$hashid)
   return(jwt)

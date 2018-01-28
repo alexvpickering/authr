@@ -19,8 +19,7 @@ register_user <- function(email, password) {
   con <- mongolite::mongo('users', get_env('USERS_DB'))
   is_user <- con$count(sprintf('{"email": "%s"}', email))
 
-  if (is_user)
-    stop('User with email ', email, ' already exists.')
+  if (is_user) stop('User already exists.')
 
   hashid <- get_hashid(con$count()+1)
 

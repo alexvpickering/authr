@@ -57,8 +57,6 @@ See [Setting up Amazon SES](https://github.com/alexvpickering/authr/wiki/Setting
 Update `/var/www/R/entry.R` to source the `.Renviron` and specify `authr` endpoints as open (accessible by non logged-in users):
 
 ```R
-setHeader(header = "X-Powered-By", value = "rApache")
-
 # read R environmental variables 
 readRenviron('/var/www/R/.Renviron')
 
@@ -71,9 +69,7 @@ open <- list(authr = c('register_user',
                        'forgot_password',
                        'reset_password'))
 
-handlr::handle(SERVER, GET, packages, open),
-
-DONE
+handlr::handle(SERVER, GET, packages, open)
 ```
 
 

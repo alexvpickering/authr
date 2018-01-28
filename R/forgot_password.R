@@ -35,7 +35,7 @@ forgot_password <- function(email) {
   )
 
   # send forgot password email
-  send_email(email, type='forgot_pw')
+  send_email(email, type='forgot_pw', token)
   return()
 }
 
